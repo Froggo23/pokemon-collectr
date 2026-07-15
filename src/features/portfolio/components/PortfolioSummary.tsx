@@ -1,4 +1,4 @@
-import { formatUsd } from '@/shared/utils/format'
+import { formatUsdStrict } from '@/shared/utils/format'
 import type { PortfolioValuation } from '../utils/valuation'
 
 interface PortfolioSummaryProps {
@@ -9,9 +9,9 @@ interface PortfolioSummaryProps {
 export function PortfolioSummary({ valuation, pricedAsOf }: PortfolioSummaryProps) {
   return (
     <section className="portfolio-summary" aria-label="Portfolio total worth">
-      <div className="summary-label">Inventory worth</div>
+      <div className="summary-label">Collection worth</div>
       <div className="summary-total" data-testid="portfolio-total">
-        {formatUsd(valuation.totalUsd)}
+        {formatUsdStrict(valuation.totalUsd)}
       </div>
       <div className="summary-meta">
         <span data-testid="card-count">
@@ -26,10 +26,26 @@ export function PortfolioSummary({ valuation, pricedAsOf }: PortfolioSummaryProp
             <span className="dot" aria-hidden>
               ·
             </span>
-            <span className="as-of">as of {pricedAsOf}</span>
+            <span className="as-of">prices as of {pricedAsOf}</span>
           </>
         ) : null}
       </div>
+      {valuation.lines.length > 0 ? (
+        <div className="summary-strip" aria-hidden>
+          {valuation.lines.slice(0, 8).map((l) => (
+            <img
+              key={l.cardId}
+              src={l.card.imageSmall}
+              alt=""
+              className="strip-thumb"
+              loading="lazy"
+            />
+          ))}
+          {valuation.lines.length > 8 ? (
+            <span className="strip-more">+{valuation.lines.length - 8}</span>
+          ) : null}
+        </div>
+      ) : null}
     </section>
   )
 }

@@ -17,11 +17,17 @@ export function Layout({ children }: LayoutProps) {
             <h1 className="brand-title">Pokéfolio</h1>
           </div>
         </div>
-        <p className="brand-sub">Minimal inventory · live-style market mids</p>
+        <p className="brand-sub">Card art · TCGPlayer market prices · portfolio total</p>
       </header>
       <main className="site-main">{children}</main>
       <footer className="site-footer">
-        <span>Seeded market prices · toy portfolio tracker</span>
+        <span>
+          Images &amp; prices from{' '}
+          <a href="https://pokemontcg.io" target="_blank" rel="noreferrer">
+            Pokémon TCG API
+          </a>
+          · not affiliated with Pokémon / TCGPlayer
+        </span>
       </footer>
     </div>
   )

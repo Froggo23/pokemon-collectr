@@ -6,26 +6,29 @@ import { PortfolioSummary } from '@/features/portfolio/components/PortfolioSumma
 import { Layout } from '@/shared/components/Layout'
 
 export default function App() {
-  const { valuation, catalog, add, remove, inc, dec, backend, syncError } =
+  const { valuation, catalog, add, remove, inc, dec, backend, syncError, registerCard } =
     useInventory()
   const ownedIds = useMemo(
     () => new Set(valuation.lines.map((l) => l.cardId)),
     [valuation.lines],
   )
-  const pricedAsOf = catalog[0]?.pricedAsOf
+  const pricedAsOf =
+    valuation.lines[0]?.card.pricedAsOf || catalog.find((c) => c.pricedAsOf)?.pricedAsOf
+
+  const backendLabel =
+    backend === 'supabase'
+      ? 'Supabase + live TCG API'
+      : backend === 'live-api'
+        ? 'Live Pokémon TCG API'
+        : backend === 'loading'
+          ? 'Loading cards…'
+          : 'Offline seed'
 
   return (
     <Layout>
       <div className="backend-bar" data-testid="backend-mode">
         <span>
-          Backend:{' '}
-          <strong>
-            {backend === 'supabase'
-              ? 'Supabase'
-              : backend === 'loading'
-                ? 'Connecting…'
-                : 'Local'}
-          </strong>
+          Data · <strong>{backendLabel}</strong>
         </span>
         {syncError ? <span className="backend-err">{syncError}</span> : null}
       </div>
@@ -33,8 +36,8 @@ export default function App() {
       <div className="panels">
         <section className="inventory-panel" aria-label="Your inventory">
           <div className="panel-head">
-            <h2>Your inventory</h2>
-            <p className="panel-hint">Market value × quantity for each line</p>
+            <h2>Your binder</h2>
+            <p className="panel-hint">Market value × quantity — card art included</p>
           </div>
           <InventoryList
             lines={valuation.lines}
@@ -43,7 +46,11 @@ export default function App() {
             onRemove={remove}
           />
         </section>
-        <CatalogSearch onAdd={add} ownedIds={ownedIds} />
+        <CatalogSearch
+          onAdd={(id, card) => add(id, card)}
+          ownedIds={ownedIds}
+          onRegisterCard={registerCard}
+        />
       </div>
     </Layout>
   )

@@ -10,17 +10,24 @@ interface DbCard {
   rarity: string
   market_price_usd: number | string
   priced_as_of: string
+  image_small?: string
+  image_large?: string
 }
 
 function mapRow(row: DbCard): CatalogCard {
+  const id = row.id
+  const [setId] = id.split('-')
   return {
-    id: row.id,
+    id,
     name: row.name,
     set: row.set_name,
+    setId: setId || 'unknown',
     number: row.number,
     rarity: row.rarity,
     marketPriceUsd: Number(row.market_price_usd),
     pricedAsOf: row.priced_as_of,
+    imageSmall: row.image_small || '',
+    imageLarge: row.image_large || row.image_small || '',
   }
 }
 

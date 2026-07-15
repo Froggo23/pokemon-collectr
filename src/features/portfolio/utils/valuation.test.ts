@@ -27,38 +27,38 @@ describe('valueInventory (shipped catalog + inventory math)', () => {
   it('computes portfolio total as sum of unitPrice × qty for multi-card fixtures', () => {
     const charizard = getCardById('base1-4')
     const pikachu = getCardById('base1-58')
-    const umbreon = getCardById('sv-prismatic-evolutions-161')
-    expect(charizard && pikachu && umbreon).toBeTruthy()
+    const lugia = getCardById('neo1-9')
+    expect(charizard && pikachu && lugia).toBeTruthy()
+    expect(charizard!.imageLarge).toContain('pokemontcg.io')
 
     let inv = addCard([], 'base1-4', 2)
     inv = addCard(inv, 'base1-58', 5)
-    inv = addCard(inv, 'sv-prismatic-evolutions-161', 1)
+    inv = addCard(inv, 'neo1-9', 1)
 
     const valued = valueInventory(inv, catalog)
 
     const expected =
       charizard!.marketPriceUsd * 2 +
       pikachu!.marketPriceUsd * 5 +
-      umbreon!.marketPriceUsd * 1
+      lugia!.marketPriceUsd * 1
 
     expect(valued.totalUsd).toBe(expected)
     expect(valued.cardCount).toBe(2 + 5 + 1)
     expect(valued.uniqueCount).toBe(3)
 
-    // Each line total is unit × qty from catalog prices
     for (const line of valued.lines) {
       const card = getCardById(line.cardId)!
       expect(line.unitPriceUsd).toBe(card.marketPriceUsd)
       expect(line.lineTotalUsd).toBe(card.marketPriceUsd * line.quantity)
+      expect(line.card.imageSmall.length).toBeGreaterThan(0)
     }
 
-    // Total equals sum of line totals (not a hardcoded constant)
     const sumLines = valued.lines.reduce((s, l) => s + l.lineTotalUsd, 0)
     expect(valued.totalUsd).toBe(sumLines)
   })
 
   it('updates total when quantity changes via setQuantity / remove', () => {
-    const card = getCardById('sv-obsidian-flames-199')!
+    const card = getCardById('base1-2')!
     let inv = addCard([], card.id, 1)
     let v = valueInventory(inv, catalog)
     expect(v.totalUsd).toBe(card.marketPriceUsd)
